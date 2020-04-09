@@ -1,4 +1,5 @@
 ; package managers
+(add-to-list 'load-path "~/.emacs.d/custom/")
 (setq package-archives
 '(("gnu" . "http://elpa.gnu.org/packages/")
 ("marmalade" . "http://marmalade-repo.org/packages/")
@@ -9,7 +10,7 @@
 (global-set-key (kbd "M-o") 'other-window)
 
 ;; dabbrev-expand
-(global-set-key (kbd "TAB") 'dabbrev-expand)
+;;(global-set-key (kbd "TAB") 'dabbrev-expand)
 
 ;; set helm-occur
 (global-set-key (kbd "M-s") 'helm-occur)
@@ -32,8 +33,15 @@
 ;; also set M-l as recenter-top-bottom
 (global-set-key (kbd "M-l") 'recenter-top-bottom)
 
-;; set helm-index
-(global-set-key (kbd "M-i") 'helm-imenu)
+;; Set helm-index
+(global-set-key (kbd "M-i") 'helm-imenu-in-all-buffers)
+
+;; set delete buffer
+(global-set-key (kbd "M-C-k") 'kill-this-buffer)
+
+;; magit diff for single file
+(global-set-key (kbd "C-c m d") 'magit-diff-buffer-file)
+(global-set-key (kbd "C-c m f") 'magit-file-popup)
 
 ;;magit
 (global-set-key (kbd "M-m") 'magit)
@@ -66,7 +74,12 @@
 (global-set-key (kbd "C-M-s") 'rgrep)
 
 ;; helm-find-files
-(global-set-key (kbd "C-x C-f") 'projectile-find-file)
+;;(global-set-key (kbd "C-x C-f") 'projectile-find-file)
+
+;; flymake ruby
+(require 'flymake-ruby)
+(add-hook 'ruby-mode-hook 'flymake-ruby-load)
+;;; flymake-ruby.el ends here
 
 ;; ido mode
 (ido-mode 1)
@@ -74,8 +87,8 @@
 (setq ido-enable-flex-matching t)
 
 ;; auto-complete
-(auto-complete-mode t)
-(global-auto-complete-mode t)
+(setq auto-complete-mode t)
+(setq global-auto-complete-mode t)
 
 ;;paranthesis mode
 (show-paren-mode t)
@@ -111,7 +124,7 @@
     ("624f3b1e86a81d1873b93edc3cce0947f2042bfeebecc480b393ff1e0aa4abfd" default)))
  '(package-selected-packages
    (quote
-    (csv-mode vlf dumb-jump git-blamed git helm magit haskell-mode ctags-update smart-mode-line diff-hl textmate auto-complete robe rainbow-delimiters rainbow-mode aggressive-indent)))
+    (typescript-mode flycheck csv-mode vlf dumb-jump git-blamed git helm magit haskell-mode ctags-update smart-mode-line diff-hl textmate auto-complete robe rainbow-delimiters rainbow-mode aggressive-indent)))
  '(visible-bell t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -197,3 +210,30 @@ Version 2015-04-09"
 
 ;; delete trailing whitespace
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+
+
+
+
+
+
+;; typescript
+(defun setup-tide-mode ()
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  ;; company is an optional dependency. You have to
+  ;; install it separately via package-install
+  ;; `M-x package-install [ret] company`
+  (company-mode +1))
+
+;; aligns annotation to the right hand side
+(setq company-tooltip-align-annotations t)
+
+;; formats the buffer before saving
+(add-hook 'before-save-hook 'tide-format-before-save)
+
+(add-hook 'typescript-mode-hook #'setup-tide-mode)
